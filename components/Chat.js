@@ -12,7 +12,7 @@ export default class Chat extends React.Component {
       messages: [],
     }
   }
-
+  /* function to display system message and welcome message  */
   componentDidMount() {
     this.setState({
       messages: [
@@ -35,13 +35,13 @@ export default class Chat extends React.Component {
       ],
     })
   }
-
+  /* function called when user sends a message  */
   onSend(messages = []) {
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }))
   }
-
+  /* function to change bubble style  */
   renderBubble(props) {
     return (
       <Bubble
@@ -62,13 +62,17 @@ export default class Chat extends React.Component {
     return (
       <View style={{ flex: 1, backgroundColor: color, height: '100%' }}>
         <GiftedChat
+          /* renders Bubble  */
           renderBubble={this.renderBubble.bind(this)}
+          /* renders state messages  */
           messages={this.state.messages}
+          /* displays last message along with previous ones  */
           onSend={messages => this.onSend(messages)}
           user={{
             _id: 1,
           }}
         />
+        {/* prevents keyboard to overlap input field on Android devices  */}
         { Platform.OS === 'android' ? <KeyboardAvoidingView behavior="height" /> : null
  }
       </View>

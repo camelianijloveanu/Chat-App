@@ -15,6 +15,7 @@ export default class Start extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+        {/* avoids hiding the chatOptions box when using keyboard */}
       <KeyboardAvoidingView
     style={styles.container}
     behavior="padding"
@@ -38,6 +39,7 @@ export default class Start extends React.Component {
                 style={styles.backgroundColorText}>
                 Choose Background Color:
               </Text>
+              {/* background color options for user to choose */}
               <View style={styles.color}>
                 <TouchableOpacity
                   style={styles.color1}
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingLeft: '5%',
     paddingRight: '5%',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
   },
   nameInput: {
     height: 55,

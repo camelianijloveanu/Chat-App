@@ -1,6 +1,6 @@
 // import react and react-native elements
 import React from 'react';
-import { View, Text, TextInput, StyleSheet, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 
 // export Start component
 export default class Start extends React.Component {
@@ -15,6 +15,10 @@ export default class Start extends React.Component {
   render() {
     return (
       <View style={styles.container}>
+      <KeyboardAvoidingView
+    style={styles.container}
+    behavior="padding"
+    enabled>
         <ImageBackground
           style={styles.imgBackground}
           source={require('../assets/Background-Image.png')}
@@ -61,6 +65,7 @@ export default class Start extends React.Component {
             </TouchableOpacity>
           </View>
         </ImageBackground>
+        </KeyboardAvoidingView>
       </View>
     )
   }

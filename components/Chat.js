@@ -5,26 +5,16 @@ import { GiftedChat, Bubble, InputToolbar } from 'react-native-gifted-chat';
 import { Platform, KeyboardAvoidingView } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from '@react-native-community/netinfo';
+import firebase from "../utiliz/firebase";
 
-// import Firestore to store data in database
-const firebase = require('firebase');
-require('firebase/firestore');
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBmfd2GQTer0fjTqbfIjz7OTZxvt-YcEvg",
-  authDomain: "chatapp-a91bb.firebaseapp.com",
-  projectId: "chatapp-a91bb",
-  storageBucket: "chatapp-a91bb.appspot.com",
-  messagingSenderId: "548450133327",
-  appId: "1:548450133327:web:15ffc54bf255be795a113a",
-  measurementId: "G-WRG36DN160"
-};
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs(['Setting a timer']);
 
 export default class Chat extends React.Component{
 
   constructor(){
     super();
-  
+
     this.state = {
       messages: [],
       uid: 0,
@@ -35,14 +25,9 @@ export default class Chat extends React.Component{
       },
       isConnected: false,
     }
-
-  // Initialize Firebase
-  if (!firebase.apps.length){
-    firebase.initializeApp(firebaseConfig);
-    }
   this.referenceChatMessages = firebase.firestore().collection('messages');
   }
-  
+
   async getMessages() {
     let messages = '';
     try {
@@ -92,41 +77,40 @@ export default class Chat extends React.Component{
 
 
   componentDidMount(){
-    this.getMessages();
-
+    //
     let name = this.props.route.params.name;
     this.props.navigation.setOptions({ title: name });
-     
+    //
         NetInfo.fetch().then((connection) => {
       if (connection.isConnected) {
         this.setState({
           isConnected: true,
         });
-
-        this.referenceChatMessages = firebase
-          .firestore()
-          .collection('messages');
+    //
+        this.referenceChatMessages.orderBy('createdAt', 'desc').onSnapshot(this.onCollectionUpdate);
         this.authUnsubscribe = firebase
           .auth()
           .onAuthStateChanged(async (user) => {
             if (!user) {
-              await firebase.auth().signInAnonymously();
-            }
 
-            
-      this.setState({
-        uid: user.uid,
-        messages: [],
-        user:{
-          _id: user.uid,
-          name: user.name,
-          avatar: "https://placeimg.com/158/158/any"
-        },
-              messages: [],
-            });
-            this.unsubscribe = this.referenceChatMessages
-              .orderBy('createdAt', 'desc')
-              .onSnapShot(this.onCollectionUpdate);
+              // await firebase.auth().signInAnonymously();
+              user ={
+                uid: 1,
+                name: this.props.route.params.name
+              }
+            }
+         console.log(user)
+    //
+            this.setState((prevState) => ({
+              ...prevState,
+              uid: user.uid,
+              user:{
+                _id: user.uid,
+                name: user.name,
+                avatar: "https://placeimg.com/158/158/any"
+              }
+            }))
+
           });
       } else {
         this.setState({
@@ -134,19 +118,21 @@ export default class Chat extends React.Component{
         });
         this.getMessages();
       }
-    });
+        })
   }
 
   componentWillUnmount() {
     this.authUnsubscribe();
- 
+    this.referenceChatMessages = () => {}
+
   }
 
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
+    // console.log(querySnapshot)
     // go through each document
     querySnapshot.forEach((doc) => {
-      // get the QueryDocumentSnapshot's data
+    //   // get the QueryDocumentSnapshot's data
       let data = doc.data();
       messages.push({
         _id: data._id,
@@ -160,20 +146,10 @@ export default class Chat extends React.Component{
     })
   }
 
-  addMessage() {
-    const message = this.state.messages[0];
-    this.referenceChatMessages.add({
-      _id: message._id,
-      uid: this.state.uid,
-      text: message.text || '',
-      createdAt: message.createdAt,
-      user: message.user,
-    });
-  }
-
 
   /* function called when user sends a message  */
   onSend(messages = []) {
+
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }),

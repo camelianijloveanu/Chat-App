@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
   },
   main: {
-    flex: 0.50, 
+    flex: 0.50,
  },
   chatOptions: {
     flex: 0.40,
@@ -99,7 +99,6 @@ const styles = StyleSheet.create({
   },
   nameInput: {
     height: 55,
-    borderColor: 'gray',
     borderWidth: 1,
     borderColor: '#757083',
     borderRadius: 5,

@@ -6,6 +6,8 @@ import { Platform, KeyboardAvoidingView } from 'react-native';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from '@react-native-community/netinfo';
 import firebase from "../utiliz/firebase";
+import MapView from 'react-native-maps';
+import CustomActions from './CustomActions';
 
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['Setting a timer']);
@@ -24,6 +26,8 @@ export default class Chat extends React.Component{
         avatar: '',
       },
       isConnected: false,
+      image: null,
+      location: null,
     }
   this.referenceChatMessages = firebase.firestore().collection('messages');
   }
@@ -71,6 +75,8 @@ export default class Chat extends React.Component{
     text: message.text || null,
     createdAt: message.createdAt,
     user: message.user,
+    image: message.image || null,
+    location: message.location || null,
   })
 }
 
@@ -108,7 +114,12 @@ export default class Chat extends React.Component{
                 _id: user.uid,
                 name: user.name,
                 avatar: "https://placeimg.com/158/158/any"
-              }
+              },
+              image: this.state.image,
+              location: {
+                longitude: 11.5249684,
+                latitude: 48.0643933,
+              },
             }))
 
           });
@@ -139,6 +150,8 @@ export default class Chat extends React.Component{
         text: data.text,
         createdAt: data.createdAt.toDate(),
         user: data.user,
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({
@@ -180,6 +193,28 @@ export default class Chat extends React.Component{
     }
   }
 
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
+  renderCustomView(props) {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  }
+
   render() {
     let color = this.props.route.params.color;
 
@@ -190,6 +225,8 @@ export default class Chat extends React.Component{
           /* renders Bubble  */
           renderBubble={this.renderBubble.bind(this)}
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView}
           messages={this.state.messages}
           isConnected={this.state.isConnected}
           onSend={(messages) => this.onSend(messages)}

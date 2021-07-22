@@ -8,8 +8,11 @@ import NetInfo from '@react-native-community/netinfo';
 import firebase from "../utiliz/firebase";
 import MapView from 'react-native-maps';
 import CustomActions from './CustomActions';
+
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['Setting a timer']);
+
+
 export default class Chat extends React.Component{
   constructor(){
     super();
@@ -38,6 +41,8 @@ export default class Chat extends React.Component{
       console.log(error.message);
     }
   }
+
+  // save messages to state
   async saveMessages() {
     try {
       await AsyncStorage.setItem(
@@ -48,6 +53,8 @@ export default class Chat extends React.Component{
       console.log(error.message);
     }
   }
+
+  // delete messages from local storage when necessary
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem('messages');
@@ -71,16 +78,16 @@ export default class Chat extends React.Component{
   })
 }
   componentDidMount(){
-    //
+    
     let name = this.props.route.params.name;
     this.props.navigation.setOptions({ title: name });
-    //
+  
         NetInfo.fetch().then((connection) => {
       if (connection.isConnected) {
         this.setState({
           isConnected: true,
         });
-    //
+    // onSnapshot function listens for collection updates
         this.referenceChatMessages.orderBy('createdAt', 'desc').onSnapshot(this.onCollectionUpdate);
         this.authUnsubscribe = firebase
           .auth()
@@ -93,7 +100,6 @@ export default class Chat extends React.Component{
               }
             }
          console.log("user after login", user)
-    //
             this.setState((prevState) => ({
               ...prevState,
               uid: user.uid,
@@ -165,12 +171,16 @@ export default class Chat extends React.Component{
       />
     )
   }
+
+  // inputToolbar displayed when user is online
   renderInputToolbar(props) {
     if (this.state.isConnected === false) {
     } else {
       return <InputToolbar {...props} />;
     }
   }
+
+  // button to access features like send img or location
   renderCustomActions = (props) => {
     return <CustomActions {...props} />;
   };
@@ -196,9 +206,11 @@ export default class Chat extends React.Component{
     return (
       <View style={{ flex: 1, backgroundColor: color, height: '100%' }}>
         <GiftedChat
-          /* renders Bubble  */
+          // renders Bubble 
           renderBubble={this.renderBubble.bind(this)}
+          // removes inputToolbar when user is offline
           renderInputToolbar={this.renderInputToolbar.bind(this)}
+          // renders features to send img or location
           renderActions={this.renderCustomActions}
           renderCustomView={this.renderCustomView}
           messages={this.state.messages}

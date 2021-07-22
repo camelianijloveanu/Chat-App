@@ -1,6 +1,8 @@
 const firebase = require('firebase');
 require('firebase/firestore');
 
+
+// firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyBmfd2GQTer0fjTqbfIjz7OTZxvt-YcEvg",
   authDomain: "chatapp-a91bb.firebaseapp.com",

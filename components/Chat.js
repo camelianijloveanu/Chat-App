@@ -8,15 +8,11 @@ import NetInfo from '@react-native-community/netinfo';
 import firebase from "../utiliz/firebase";
 import MapView from 'react-native-maps';
 import CustomActions from './CustomActions';
-
 import { LogBox } from 'react-native';
 LogBox.ignoreLogs(['Setting a timer']);
-
 export default class Chat extends React.Component{
-
   constructor(){
     super();
-
     this.state = {
       messages: [],
       uid: 0,
@@ -31,7 +27,6 @@ export default class Chat extends React.Component{
     }
   this.referenceChatMessages = firebase.firestore().collection('messages');
   }
-
   async getMessages() {
     let messages = '';
     try {
@@ -43,7 +38,6 @@ export default class Chat extends React.Component{
       console.log(error.message);
     }
   }
-
   async saveMessages() {
     try {
       await AsyncStorage.setItem(
@@ -54,7 +48,6 @@ export default class Chat extends React.Component{
       console.log(error.message);
     }
   }
-
   async deleteMessages() {
     try {
       await AsyncStorage.removeItem('messages');
@@ -65,11 +58,9 @@ export default class Chat extends React.Component{
       console.log(error.message);
     }
   }
-
    // add messages to state and database
  addMessage(){
   const message = this.state.messages[0];
-
   this.referenceChatMessages.add({
     _id: message._id,
     text: message.text || null,
@@ -79,9 +70,6 @@ export default class Chat extends React.Component{
     location: message.location || null,
   })
 }
-
-
-
   componentDidMount(){
     //
     let name = this.props.route.params.name;
@@ -98,21 +86,20 @@ export default class Chat extends React.Component{
           .auth()
           .onAuthStateChanged(async (user) => {
             if (!user) {
-
-              // await firebase.auth().signInAnonymously();
-              user ={
-                uid: 1,
-                name: this.props.route.params.name
+              console.log("user before", user)
+              let aUser = await firebase.auth().signInAnonymously();
+              user={
+                uid: aUser.uid,
               }
             }
-         console.log(user)
+         console.log("user after login", user)
     //
             this.setState((prevState) => ({
               ...prevState,
               uid: user.uid,
               user:{
                 _id: user.uid,
-                name: user.name,
+                name: this.props.route.params.name,
                 avatar: "https://placeimg.com/158/158/any"
               },
               image: this.state.image,
@@ -121,7 +108,6 @@ export default class Chat extends React.Component{
                 latitude: 48.0643933,
               },
             }))
-
           });
       } else {
         this.setState({
@@ -131,13 +117,10 @@ export default class Chat extends React.Component{
       }
         })
   }
-
   componentWillUnmount() {
     this.authUnsubscribe();
     this.referenceChatMessages = () => {}
-
   }
-
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     // console.log(querySnapshot)
@@ -158,11 +141,8 @@ export default class Chat extends React.Component{
       messages,
     })
   }
-
-
   /* function called when user sends a message  */
   onSend(messages = []) {
-
     this.setState(previousState => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }),
@@ -185,18 +165,15 @@ export default class Chat extends React.Component{
       />
     )
   }
-
   renderInputToolbar(props) {
     if (this.state.isConnected === false) {
     } else {
       return <InputToolbar {...props} />;
     }
   }
-
   renderCustomActions = (props) => {
     return <CustomActions {...props} />;
   };
-
   renderCustomView(props) {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -214,11 +191,8 @@ export default class Chat extends React.Component{
     }
     return null;
   }
-
   render() {
     let color = this.props.route.params.color;
-
-
     return (
       <View style={{ flex: 1, backgroundColor: color, height: '100%' }}>
         <GiftedChat
